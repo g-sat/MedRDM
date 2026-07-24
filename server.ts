@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
-import { redactPHI } from "./src/utils/security.js";
+import { redactPHI } from "./src/utils/security";
 
 const app = express();
 const PORT = 3000;
@@ -26,7 +26,7 @@ const getGenAIClient = () => {
 };
 
 // API Health Check
-app.get("/api/health", (req, res) => {
+app.get(["/api/health", "/health"], (req, res) => {
   res.json({
     status: "ok",
     service: "OrphanDx Clinical Diagnostic Backend",
@@ -36,7 +36,7 @@ app.get("/api/health", (req, res) => {
 });
 
 // Endpoint: PHI Redaction Preview
-app.post("/api/redact-phi", (req, res) => {
+app.post(["/api/redact-phi", "/redact-phi"], (req, res) => {
   try {
     const { text } = req.body;
     if (!text) {
@@ -50,7 +50,7 @@ app.post("/api/redact-phi", (req, res) => {
 });
 
 // Endpoint: Analyze Clinical Referral Email
-app.post("/api/analyze-referral", async (req, res) => {
+app.post(["/api/analyze-referral", "/analyze-referral"], async (req, res) => {
   try {
     const {
       emailText,
