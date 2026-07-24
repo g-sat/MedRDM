@@ -1,6 +1,5 @@
 import express from "express";
 import path from "path";
-import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import { redactPHI } from "./src/utils/security";
 
@@ -11,12 +10,9 @@ app.use(express.json({ limit: "10mb" }));
 
 // Initialize Google GenAI client
 const getGenAIClient = () => {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    console.warn("GEMINI_API_KEY environment variable is missing.");
-  }
+  const apiKey = process.env.GEMINI_API_KEY || "";
   return new GoogleGenAI({
-    apiKey: apiKey || "",
+    apiKey,
     httpOptions: {
       headers: {
         "User-Agent": "aistudio-build",
@@ -26,7 +22,7 @@ const getGenAIClient = () => {
 };
 
 // API Health Check
-app.get(["/api/health", "/health"], (req, res) => {
+app.get(["/api/health", "/health", "/api/index", "/api"], (req, res) => {
   res.json({
     status: "ok",
     service: "OrphanDx Clinical Diagnostic Backend",
@@ -408,12 +404,17 @@ Analyze the referral thoroughly. Extract all symptoms, evaluate rare vs common d
 
 // Vite Middleware Integration
 async function startServer() {
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
+  if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+    try {
+      const { createServer: createViteServer } = await import("vite");
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: "spa",
+      });
+      app.use(vite.middlewares);
+    } catch (err) {
+      console.warn("Vite dev middleware initialization skipped:", err);
+    }
   } else {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
