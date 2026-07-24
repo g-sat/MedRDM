@@ -1,0 +1,6 @@
+{
+  "name": "OrphanDx - Clinical Email Diagnostic & Rare Disease Analyzer",
+  "description": "A clinical decision support workstation for doctors to analyze referral emails, extract symptom timelines, evaluate rare vs common diseases using Gemini Pro, and generate HIPAA-compliant diagnostic reports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
