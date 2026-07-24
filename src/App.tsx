@@ -93,7 +93,10 @@ export default function App() {
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || errData.details || `Server returned HTTP ${response.status}`);
+        const msg = errData.details
+          ? `${errData.error || 'Server Error'}: ${errData.details}`
+          : errData.error || `Server returned HTTP ${response.status}`;
+        throw new Error(msg);
       }
 
       const reportData: DiagnosticReport = await response.json();
